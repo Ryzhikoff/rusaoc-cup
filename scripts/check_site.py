@@ -10,6 +10,7 @@ from urllib.parse import urlsplit, unquote
 from html.parser import HTMLParser
 
 import liquipedia
+import tournaments
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -81,6 +82,17 @@ def check_site(directory=ROOT / "site"):
                 if counts != player.get("goodgamePlaces", [0, 0, 0, 0]):
                     raise ValueError(f"{name}: inconsistent GoodGame places")
         if name == "rusaoc-cup-statistics.html":
+            catalog = tournaments.read_catalog(text)
+            tournaments.validate_catalog(catalog, seed)
+            if not catalog.get("earnings"):
+                raise ValueError("Missing player earnings snapshot")
+            for img in catalog.get("mapImages", {}).values():
+                path = directory / img["path"]
+                if not path.is_file() or not tournaments.image_extension(path.read_bytes()):
+                    raise ValueError(f"Missing or invalid map thumbnail: {path}")
+            for asset in ("tournaments.css", "tournaments.js"):
+                if not (directory / asset).is_file():
+                    raise ValueError(f"Missing catalogue asset: {asset}")
             for idx, event in enumerate(seed["events"]):
                 if event_counts[idx] != event["players"]:
                     raise ValueError(f"{name}: inconsistent event participants")

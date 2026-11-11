@@ -8,6 +8,7 @@ import tempfile
 import google_sheet
 import goodgame
 import liquipedia
+import tournaments
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = ("rusaoc-cup-liquipedia.html", "rusaoc-cup-statistics.html")
@@ -43,13 +44,25 @@ def update_site(directory=ROOT / "site"):
     countries = liquipedia.make_countries(names, liquipedia.fetch_player_profiles(names))
     if not countries["players"]:
         raise ValueError("No country information returned")
+    previous_catalog = tournaments.read_catalog(originals[FILES[1]])
+    catalog, assets = tournaments.build_catalog(liquipedia.PAGES, sheet, previous_catalog, directory)
     prepared = {}
     for name, snapshot in snapshots.items():
         document = liquipedia.replace_json(originals[name], "seed", snapshot)
         prepared[name] = liquipedia.replace_json(document, "countries", countries)
+    prepared[FILES[1]] = liquipedia.replace_json(prepared[FILES[1]], "tournaments", catalog)
     with tempfile.TemporaryDirectory(prefix=".rusaoc-update-", dir=directory.parent) as temporary:
         for name, document in prepared.items():
             (Path(temporary) / name).write_text(document, encoding="utf-8")
+        for name, payload in assets.items():
+            target = Path(temporary) / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(payload)
+        # New immutable assets first; existing pages keep using their old files
+        # until all validated HTML documents are ready to replace them.
+        for name in assets:
+            (directory / name).parent.mkdir(parents=True, exist_ok=True)
+            (Path(temporary) / name).replace(directory / name)
         for name in prepared:
             (Path(temporary) / name).replace(directory / name)
     for name, snapshot in snapshots.items():

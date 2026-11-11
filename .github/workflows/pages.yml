@@ -35,7 +35,7 @@ jobs:
           python-version: '3.13'
       - name: Test parsers and failure handling
         run: python -m unittest discover -s tests -v
-      - name: Refresh Google Sheets, GoodGame, Liquipedia and country flags
+      - name: Refresh statistics, tournament catalogue and map images
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.refresh)
         run: python -u scripts/update.py
       - name: Validate published files
@@ -43,7 +43,7 @@ jobs:
       - name: Save the successful daily snapshot
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.refresh)
         run: |
-          git add site/rusaoc-cup-liquipedia.html site/rusaoc-cup-statistics.html
+          git add site/rusaoc-cup-liquipedia.html site/rusaoc-cup-statistics.html site/maps/
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Update daily statistics snapshot'
             git push origin HEAD:main

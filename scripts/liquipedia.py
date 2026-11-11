@@ -345,12 +345,29 @@ def read_seed(path):
     return json.loads(match.group(1))
 
 
+_last_request = 0.0
+_last_parse = 0.0
+
+
+def throttle_api(parse=False):
+    """Respect Liquipedia's shared request and heavier parse limits."""
+    global _last_request, _last_parse
+    now = time.monotonic()
+    delay = max(0, _last_request + 2.1 - now, _last_parse + 30.1 - now if parse else 0)
+    if delay:
+        time.sleep(delay)
+    _last_request = time.monotonic()
+    if parse:
+        _last_parse = _last_request
+
+
 def api_query(**params):
     params.update(format="json", formatversion=2, maxlag=5)
     url = API + "?" + urlencode(params)
     request = Request(url, headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"})
     for attempt in range(4):
         try:
+            throttle_api(params.get("action") == "parse")
             with urlopen(request, timeout=75) as response:
                 payload = response.read()
                 if response.headers.get("Content-Encoding") == "gzip":
