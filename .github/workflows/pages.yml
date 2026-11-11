@@ -1,0 +1,69 @@
+name: Update and publish statistics
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 08:17 Asia/Tomsk (UTC+7); avoid the start-of-hour queue.
+    - cron: '17 1 * * *'
+  workflow_dispatch:
+    inputs:
+      refresh:
+        description: Download fresh statistics before publishing
+        type: boolean
+        default: true
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Test parsers and failure handling
+        run: python -m unittest discover -s tests -v
+      - name: Refresh both sources and country flags
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.refresh)
+        run: python -u scripts/update.py
+      - name: Validate published files
+        run: python scripts/check_site.py
+      - name: Save the successful daily snapshot
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.refresh)
+        run: |
+          git add site/rusaoc-cup-liquipedia.html site/rusaoc-cup-statistics.html
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Update daily statistics snapshot'
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Publish GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
