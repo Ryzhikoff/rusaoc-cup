@@ -39,6 +39,8 @@ python3 -m http.server 8000 --directory site
 
 ## Источники
 
+- [Иконка турнира Rusaoc Cup](https://liquipedia.net/commons/images/thumb/9/9b/Rusaoc_cup_icon.png/100px-Rusaoc_cup_icon.png)
+
 - [Google Таблица Rusaoc Cup](https://docs.google.com/spreadsheets/d/1zDXLyhJwHMQhtCvrNnvTV8H3tVx2WRyXRlqzmrIZRwo/edit)
 - [Liquipedia Rusaoc Cup](https://liquipedia.net/ageofempires/Rusaoc_Cup)
 - [GitHub Pages workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
