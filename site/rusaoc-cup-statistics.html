@@ -118,7 +118,8 @@
     @media(max-width:560px) { .topline{font-size:10px}.hero{padding-top:22px}.actions{flex-direction:column}.intro{font-size:14px}.summary{gap:8px}.metric{padding:12px}.metric strong{font-size:25px}.toolbar{padding:12px}.search,.sortbar{width:100%}.sortbar select{flex:1}.format-line{grid-template-columns:42px minmax(0,1fr) 94px 60px;gap:6px}.drawer{padding:20px 16px}.profile-metrics{grid-template-columns:repeat(2,1fr)} }
 
     .player-identity{display:inline-flex;align-items:center;gap:7px;min-width:0}
-    .country-flag{flex:none;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:1.2em;line-height:1}
+    .country-flag{display:block;flex:none;width:20px;height:15px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px #ffffff26}
+    .drawer-name .country-flag{width:28px;height:21px}
     .supplement-title{display:block;color:var(--blue);font-size:10px;white-space:nowrap}
     .source-badge{font-size:11px;white-space:nowrap}
     .coverage-line + .coverage-line{margin-top:7px}
@@ -161,7 +162,7 @@
     const countryKey=name=>name.trim().replace(/[\s_]+/g,' ').toLowerCase();
     const countryFor=name=>Object.hasOwn(countryData.players,countryKey(name))?countryData.players[countryKey(name)]:null;
     const countryName=country=>regionNames?regionNames.of(country.code):country.code;
-    function playerName(name){const country=countryFor(name);const flag=country?`<span class="country-flag" role="img" aria-label="${esc(countryName(country))}" title="${esc(countryName(country))}">${String.fromCodePoint(...[...country.code].map(c=>127397+c.charCodeAt(0)))}</span>`:'';return `<span class="player-identity">${flag}<span>${esc(name)}</span></span>`;}
+    function playerName(name){const country=countryFor(name);const flag=country?`<img class="country-flag" src="flags/${esc(country.code.toLowerCase())}.svg" width="20" height="15" alt="${esc(countryName(country))}" title="${esc(countryName(country))}">`:'';return `<span class="player-identity">${flag}<span>${esc(name)}</span></span>`;}
     function countryDetails(name){const country=countryFor(name);return country?`<p class="drawer-country">${esc(countryName(country))} · <a href="${esc(country.source)}" target="_blank" rel="noopener noreferrer">Страна на Liquipedia ↗</a></p>`:'';}
     function renderCountryNote(players){const known=players.filter(p=>countryFor(p.name)).length;const date=new Date(countryData.updated).toLocaleDateString('ru-RU');$('country-note').textContent=`Флаги: страна указана у ${known} из ${players.length} ${plural(players.length,'игрока','игроков','игроков')} в профилях или турнирах Liquipedia (проверено ${date}). При отсутствии данных флаг не показывается.`;}
     const modes=['1v1','2v2','3v3','FFA'];

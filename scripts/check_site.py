@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+import xml.etree.ElementTree as ET
 from urllib.parse import urlsplit, unquote
 from html.parser import HTMLParser
 
@@ -26,6 +27,15 @@ class Links(HTMLParser):
 
 
 def check_site(directory=ROOT / "site"):
+    # Cover future countries too: daily data updates must never introduce
+    # a country code whose flag image is absent from the published site.
+    for code in liquipedia.COUNTRY_CODES:
+        flag = directory / "flags" / f"{code.lower()}.svg"
+        if not flag.is_file():
+            raise ValueError(f"Missing local flag: {code}")
+        root = ET.fromstring(flag.read_bytes())
+        if root.tag != "{http://www.w3.org/2000/svg}svg" or not root.get("viewBox"):
+            raise ValueError(f"Invalid flag image: {code}")
     countries = []
     for name in ("index.html", "rusaoc-cup-liquipedia.html", "rusaoc-cup-statistics.html"):
         path = directory / name
