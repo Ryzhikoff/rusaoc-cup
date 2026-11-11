@@ -2,6 +2,7 @@
 """Check snapshots and offline navigation before publishing."""
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -93,6 +94,9 @@ def check_site(directory=ROOT / "site"):
             for asset in ("tournaments.css", "tournaments.js"):
                 if not (directory / asset).is_file():
                     raise ValueError(f"Missing catalogue asset: {asset}")
+                version = hashlib.sha256((directory / asset).read_bytes()).hexdigest()[:12]
+                if f'"{asset}?v={version}"' not in text:
+                    raise ValueError(f"Update the asset URL in {name} to {asset}?v={version} to invalidate browser caches")
             for idx, event in enumerate(seed["events"]):
                 if event_counts[idx] != event["players"]:
                     raise ValueError(f"{name}: inconsistent event participants")
