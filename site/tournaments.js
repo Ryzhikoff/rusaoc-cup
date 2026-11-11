@@ -29,6 +29,7 @@
       <div class="metric"><small>Призовые · рубли</small><strong id="t-rub-total"></strong><span id="t-rub-coverage"></span></div>
       <div class="metric"><small>Призовые · доллары</small><strong id="t-usd-total"></strong><span id="t-usd-coverage"></span></div>
     </section>
+    <section class="catalog-popular" aria-label="Популярные карты"><div class="catalog-head"><h2>Популярные карты</h2><p>Нажмите на карту, чтобы выбрать турниры с ней.</p></div><div class="popular-maps" id="popular-maps"></div><button id="maps-more" class="maps-more" type="button">Показать все карты</button></section>
     <section class="board" aria-label="Каталог турниров">
       <div class="catalog-toolbar">
         <label>Номер, название или карта<input id="t-search" type="search" placeholder="Найти турнир…"></label>
@@ -39,8 +40,7 @@
       </div>
       <div class="catalog-status"><span id="t-result-count"></span><button class="catalog-reset" id="t-reset" type="button">Сбросить фильтры</button></div>
       <div class="table-scroll"><table class="catalog-table"><thead><tr><th>Турнир</th><th>Дата</th><th>Формат</th><th>Карты</th><th>Игроков</th><th>Призовые · ₽</th><th>Призовые · $</th></tr></thead><tbody id="t-rows"></tbody></table></div>
-    </section>
-    <section class="catalog-popular" aria-label="Популярные карты"><div class="catalog-head"><h2>Популярные карты</h2><p>Нажмите на карту, чтобы выбрать турниры с ней.</p></div><div class="popular-maps" id="popular-maps"></div><button id="maps-more" class="maps-more" type="button">Показать все карты</button></section>`;
+    </section>`;
   const dialog=document.createElement('dialog');
   dialog.id='tournament-detail';dialog.className='tournament-dialog';dialog.setAttribute('aria-labelledby','tournament-heading');
   dialog.innerHTML='<div class="tournament-head"><div><h2 id="tournament-heading"></h2><p id="tournament-subtitle"></p></div><div class="tournament-actions"><button class="about-button" id="tournament-about" type="button" aria-haspopup="dialog" aria-controls="about-data">О данных</button><button class="close" id="tournament-close" type="button" aria-label="Закрыть турнир" autofocus>×</button></div></div><div class="tournament-body" id="tournament-body"></div>';
