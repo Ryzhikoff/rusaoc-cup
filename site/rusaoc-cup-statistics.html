@@ -159,7 +159,7 @@
     const countryName=country=>regionNames?regionNames.of(country.code):country.code;
     function playerName(name){const country=countryFor(name);const flag=country?`<span class="country-flag" role="img" aria-label="${esc(countryName(country))}" title="${esc(countryName(country))}">${String.fromCodePoint(...[...country.code].map(c=>127397+c.charCodeAt(0)))}</span>`:'';return `<span class="player-identity">${flag}<span>${esc(name)}</span></span>`;}
     function countryDetails(name){const country=countryFor(name);return country?`<p class="drawer-country">${esc(countryName(country))} · <a href="${esc(country.source)}" target="_blank" rel="noopener noreferrer">Страна на Liquipedia ↗</a></p>`:'';}
-    function renderCountryNote(players){const known=players.filter(p=>countryFor(p.name)).length;const date=new Date(countryData.updated).toLocaleDateString('ru-RU',{timeZone:'Asia/Tomsk'});$('country-note').textContent=`Флаги: страна указана у ${known} из ${players.length} игроков в профилях или турнирах Liquipedia (проверено ${date}). При отсутствии данных флаг не показывается.`;}
+    function renderCountryNote(players){const known=players.filter(p=>countryFor(p.name)).length;const date=new Date(countryData.updated).toLocaleDateString('ru-RU');$('country-note').textContent=`Флаги: страна указана у ${known} из ${players.length} игроков в профилях или турнирах Liquipedia (проверено ${date}). При отсутствии данных флаг не показывается.`;}
     const modes=['1v1','2v2','3v3','FFA'];
     let data=seed,sort='entries',descending=true,selected=null;
     function avatar(name) { return `<span class="avatar" aria-hidden="true">${esc(name.charAt(0).toUpperCase())}</span>`; }
@@ -175,7 +175,7 @@
       $('event-count').textContent=num.format(filled.length); $('event-total').textContent=`из ${num.format(data.events.length)} колонок турниров`;
       $('player-count').textContent=num.format(data.players.length);$('entry-count').textContent=num.format(entries);
       $('game-count').textContent=num.format(all.reduce((n,p)=>n+p.games,0));
-      $('updated').textContent=new Date(data.updated).toLocaleString('ru-RU',{timeZone:'Asia/Tomsk',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})+' (Томск)';
+      $('updated').textContent=new Date(data.updated).toLocaleString('ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
       const empty=data.events.filter(e=>!e.players).map(e=>e.name.replace('Rusaoc Cup ',''));
       $('coverage-text').innerHTML=empty.length ? `<strong>Покрытие источника:</strong> в Google-таблице пока нет результатов для выпусков №${esc(empty.join(', '))}. Они не включены в рейтинг, даже если сетки уже есть на Liquipedia.` : '<strong>Покрытие источника:</strong> во всех колонках турниров есть результаты.';
       const leaders=[['Больше всего участий','entries','◈'],['Больше всего титулов','titles','♛'],['Больше всего побед на картах','wins','✦']];
