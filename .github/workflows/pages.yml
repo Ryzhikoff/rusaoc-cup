@@ -35,7 +35,7 @@ jobs:
           python-version: '3.13'
       - name: Test parsers and failure handling
         run: python -m unittest discover -s tests -v
-      - name: Refresh both sources and country flags
+      - name: Refresh Google Sheets, GoodGame, Liquipedia and country flags
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.refresh)
         run: python -u scripts/update.py
       - name: Validate published files

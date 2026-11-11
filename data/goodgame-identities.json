@@ -1,0 +1,66 @@
+{
+  "note": "Явные соответствия ников Google Таблицы, GoodGame и Liquipedia. Проверено по турнирам 186–192 и контрольному турниру 187. Нечёткое сравнение имён не используется.",
+  "aliases": {
+    "oladushek__": "OLADUSHEK",
+    "h1ew": "Lamo",
+    "h1ew (lamo)": "Lamo",
+    "iantagonisti": "AntagonisT",
+    "lordofmos": "classicpro",
+    "andrey_911": "Andrey",
+    "dzedanik": "Daniil",
+    "daniil_dz": "Daniil",
+    "_smy_": "exGC_SMY",
+    "smy": "exGC_SMY",
+    "andao": "GRIGORYAN",
+    "youtegg_mangoneluser": "mangoneluser",
+    "3d.bee": "3D!Bee",
+    "bee": "3D!Bee",
+    "vragorez4000": "Vragorez",
+    "wide.": "wide",
+    "karabas__": "Karabas",
+    "_legate_": "Legate",
+    "ft_bourbon": "Bourbon",
+    "thegreatbourbon": "Bourbon",
+    "dark_of_empires": "Dark",
+    "vik_vinchester": "Vinchester",
+    "vik_warrior": "WaRRioR",
+    "mr.moon": "mr_moon",
+    "marbas": "Marbas9969",
+    "_district_": "District",
+    "landau_": "Landau",
+    "beifogor": "Belfogor",
+    "alfons_dober1": "Alfons_D",
+    "alfons_dober": "Alfons_D",
+    "timurinho_hair": "timurinho1436"
+  },
+  "users": {
+    "492483": "OLADUSHEK",
+    "1482101": "Lamo",
+    "1392644": "AntagonisT",
+    "140366": "classicpro",
+    "1395933": "Andrey",
+    "1636616": "Daniil",
+    "1667953": "exGC_SMY",
+    "1676343": "GRIGORYAN",
+    "1676710": "mangoneluser",
+    "64992": "3D!Bee",
+    "1392496": "Vragorez",
+    "1388378": "wide",
+    "1320979": "Karabas",
+    "1659954": "Legate",
+    "1324452": "Bourbon",
+    "1347080": "Dark",
+    "632478": "Vinchester",
+    "136965": "WaRRioR",
+    "611086": "mr_moon"
+  },
+  "rosters": {
+    "189": {
+      "1695542": {
+        "players": ["Don_Maximiliano", "nothing_unreal", "Konstantin_OK"],
+        "sources": ["https://docs.google.com/spreadsheets/d/1inFCHqQE851ISZD3oxSeRPkgxyPTXzTfqD0pvsqyKHM/edit#gid=2075350753", "https://liquipedia.net/ageofempires/Rusaoc_Cup/189"],
+        "note": "Единственная отсутствующая тройка: эти три участника остаются из 36 подтверждённых в таблице организатора после сопоставления 11 полных составов Liquipedia. Don_Maximiliano представляет команду в сетке GoodGame. Проверено 2026-11-11."
+      }
+    }
+  }
+}

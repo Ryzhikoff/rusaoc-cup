@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 
 import google_sheet
+import goodgame
 import liquipedia
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +35,7 @@ def update_site(directory=ROOT / "site"):
     sheet = google_sheet.fetch_sheet()
     liquipedia.PAGES = liquipedia.fetch_pages()
     wiki = liquipedia.make_seed(liquipedia.build())
+    sheet = goodgame.supplement_sheet(sheet, liquipedia.PAGES, previous[FILES[1]])
     snapshots = dict(zip(FILES, (wiki, sheet)))
     for name, snapshot in snapshots.items():
         validate_seed(snapshot, previous[name], name)

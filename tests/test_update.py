@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import google_sheet
+import goodgame
 import liquipedia
 import update
 
@@ -80,7 +81,7 @@ class PublicationTests(unittest.TestCase):
             directory = Path(temporary)
             for name in update.FILES:
                 (directory / name).write_text(document)
-            with patch.object(google_sheet, "fetch_sheet", return_value=seed), patch.object(liquipedia, "fetch_pages", return_value={}), patch.object(liquipedia, "build", return_value=[]), patch.object(liquipedia, "make_seed", return_value=seed), patch.object(liquipedia, "fetch_player_profiles", side_effect=RuntimeError("API unavailable")):
+            with patch.object(google_sheet, "fetch_sheet", return_value=seed), patch.object(goodgame, "supplement_sheet", return_value=seed), patch.object(liquipedia, "fetch_pages", return_value={}), patch.object(liquipedia, "build", return_value=[]), patch.object(liquipedia, "make_seed", return_value=seed), patch.object(liquipedia, "fetch_player_profiles", side_effect=RuntimeError("API unavailable")):
                 with self.assertRaisesRegex(RuntimeError, "API unavailable"):
                     update.update_site(directory)
             for name in update.FILES:
