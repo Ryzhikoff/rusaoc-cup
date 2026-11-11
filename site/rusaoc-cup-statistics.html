@@ -47,11 +47,11 @@
     .leader-card small { display:block; color:var(--muted); font-size:11px; }
     .leader-card b { display:block; font-size:15px; }
     .leader-card strong { margin-left:auto; color:var(--gold); font:700 23px Georgia,serif; }
-    .format-line { display:grid; grid-template-columns:47px 1fr 73px 80px; align-items:center; gap:11px; margin:12px 0; font-size:13px; }
+    .format-line { display:grid; grid-template-columns:47px minmax(0,1fr) 104px 80px; align-items:center; gap:11px; margin:12px 0; font-size:13px; }
     .format-line b { font-size:12px; }
     .bar { height:8px; overflow:hidden; background:#34414c; border-radius:10px; }
     .bar i { display:block; height:100%; border-radius:10px; background:linear-gradient(90deg,#af7e44,#f0c987); }
-    .format-line .small { color:var(--muted); text-align:right; font-size:12px; }
+    .format-line .small { white-space:nowrap; color:var(--muted); text-align:right; font-size:12px; }
     .section-head { display:flex; align-items:baseline; justify-content:space-between; gap:15px; margin:31px 0 12px; }
     .section-head h2 { margin:0; font:700 28px Georgia,serif; }
     .section-head p { margin:0; color:var(--muted); font-size:13px; }
@@ -115,7 +115,7 @@
     .event-list b { font-variant-numeric:tabular-nums; white-space:nowrap; }
     .event-list .mode-tag { display:inline-block; margin-left:5px; padding:2px 5px; border:1px solid #61717d; border-radius:5px; color:var(--blue); font-size:10px; }
     @media(max-width:800px) { .features{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}.hero{display:block}.actions{margin-top:19px;flex-direction:row}.actions button{flex:1}.section-head{display:block}.section-head p{margin-top:5px} }
-    @media(max-width:560px) { .topline{font-size:10px}.hero{padding-top:22px}.actions{flex-direction:column}.intro{font-size:14px}.summary{gap:8px}.metric{padding:12px}.metric strong{font-size:25px}.toolbar{padding:12px}.search,.sortbar{width:100%}.sortbar select{flex:1}.format-line{grid-template-columns:42px 1fr 60px 60px;gap:6px}.drawer{padding:20px 16px}.profile-metrics{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:560px) { .topline{font-size:10px}.hero{padding-top:22px}.actions{flex-direction:column}.intro{font-size:14px}.summary{gap:8px}.metric{padding:12px}.metric strong{font-size:25px}.toolbar{padding:12px}.search,.sortbar{width:100%}.sortbar select{flex:1}.format-line{grid-template-columns:42px minmax(0,1fr) 94px 60px;gap:6px}.drawer{padding:20px 16px}.profile-metrics{grid-template-columns:repeat(2,1fr)} }
 
     .player-identity{display:inline-flex;align-items:center;gap:7px;min-width:0}
     .country-flag{flex:none;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:1.2em;line-height:1}
@@ -150,6 +150,8 @@
     const $=id=>document.getElementById(id);
     const num=new Intl.NumberFormat('ru-RU');
     const percent=x=>new Intl.NumberFormat('ru-RU',{style:'percent',minimumFractionDigits:1,maximumFractionDigits:1}).format(x);
+    const pluralRules=new Intl.PluralRules('ru-RU');
+    const plural=(n,one,few,many)=>({one,few,many,other:many})[pluralRules.select(n)];
     const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
     const countryData=JSON.parse(document.getElementById('countries').textContent);
@@ -159,7 +161,7 @@
     const countryName=country=>regionNames?regionNames.of(country.code):country.code;
     function playerName(name){const country=countryFor(name);const flag=country?`<span class="country-flag" role="img" aria-label="${esc(countryName(country))}" title="${esc(countryName(country))}">${String.fromCodePoint(...[...country.code].map(c=>127397+c.charCodeAt(0)))}</span>`:'';return `<span class="player-identity">${flag}<span>${esc(name)}</span></span>`;}
     function countryDetails(name){const country=countryFor(name);return country?`<p class="drawer-country">${esc(countryName(country))} · <a href="${esc(country.source)}" target="_blank" rel="noopener noreferrer">Страна на Liquipedia ↗</a></p>`:'';}
-    function renderCountryNote(players){const known=players.filter(p=>countryFor(p.name)).length;const date=new Date(countryData.updated).toLocaleDateString('ru-RU');$('country-note').textContent=`Флаги: страна указана у ${known} из ${players.length} игроков в профилях или турнирах Liquipedia (проверено ${date}). При отсутствии данных флаг не показывается.`;}
+    function renderCountryNote(players){const known=players.filter(p=>countryFor(p.name)).length;const date=new Date(countryData.updated).toLocaleDateString('ru-RU');$('country-note').textContent=`Флаги: страна указана у ${known} из ${players.length} ${plural(players.length,'игрока','игроков','игроков')} в профилях или турнирах Liquipedia (проверено ${date}). При отсутствии данных флаг не показывается.`;}
     const modes=['1v1','2v2','3v3','FFA'];
     let data=seed,sort='entries',descending=true,selected=null;
     function avatar(name) { return `<span class="avatar" aria-hidden="true">${esc(name.charAt(0).toUpperCase())}</span>`; }
@@ -172,7 +174,7 @@
     function allStats() { return data.players.map(playerStats); }
     function renderOverview(all) {
       const filled=data.events.filter(e=>e.players>0), entries=data.events.reduce((n,e)=>n+e.players,0);
-      $('event-count').textContent=num.format(filled.length); $('event-total').textContent=`из ${num.format(data.events.length)} колонок турниров`;
+      $('event-count').textContent=num.format(filled.length); $('event-total').textContent=`из ${num.format(data.events.length)} ${plural(data.events.length,'колонки','колонок','колонок')} турниров`;
       $('player-count').textContent=num.format(data.players.length);$('entry-count').textContent=num.format(entries);
       $('game-count').textContent=num.format(all.reduce((n,p)=>n+p.games,0));
       $('updated').textContent=new Date(data.updated).toLocaleString('ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -181,9 +183,9 @@
       const leaders=[['Больше всего участий','entries','◈'],['Больше всего титулов','titles','♛'],['Больше всего побед на картах','wins','✦']];
       $('leaders').innerHTML=leaders.map(([label,key,glyph])=>{ const x=[...all].sort((a,b)=>b[key]-a[key]||a.name.localeCompare(b.name,'ru'))[0]; return `<div class="leader-card"><span class="leader-icon">${glyph}</span><div><small>${label}</small><b>${playerName(x.name)}</b></div><strong>${num.format(x[key])}</strong></div>`; }).join('');
       const max=Math.max(...modes.map(mode=>data.events.filter(e=>e.mode===mode&&e.players).length));
-      $('formats').innerHTML=modes.map(mode=>{const events=data.events.filter(e=>e.mode===mode&&e.players),participations=events.reduce((n,e)=>n+e.players,0);return `<div class="format-line"><b>${mode}</b><span class="bar"><i style="width:${events.length/max*100}%"></i></span><span class="small">${events.length} турниров</span><span class="small">${num.format(participations)} уч.</span></div>`;}).join('');
+      $('formats').innerHTML=modes.map(mode=>{const events=data.events.filter(e=>e.mode===mode&&e.players),participations=events.reduce((n,e)=>n+e.players,0);return `<div class="format-line"><b>${mode}</b><span class="bar"><i style="width:${events.length/max*100}%"></i></span><span class="small">${events.length} ${plural(events.length,'турнир','турнира','турниров')}</span><span class="small">${num.format(participations)} уч.</span></div>`;}).join('');
       const unclassified=data.players.reduce((n,p)=>n+p.results.reduce((m,r)=>m+r[3]-r[1]-r[2],0),0);
-      $('quality-note').textContent=unclassified ? `${unclassified} записей карт в Rusaoc Cup 100_2 имеют итог «1 игра, 0 побед, 0 поражений». В число карт они входят, а в винрейт — нет; винрейт считается как победы / (победы + поражения).` : 'Винрейт считается как победы / (победы + поражения).';
+      $('quality-note').textContent=unclassified ? `${unclassified} ${plural(unclassified,'запись','записи','записей')} карт в Rusaoc Cup 100_2 ${plural(unclassified,'имеет','имеют','имеют')} итог «1 игра, 0 побед, 0 поражений». В число карт они входят, а в винрейт — нет; винрейт считается как победы / (победы + поражения).` : 'Винрейт считается как победы / (победы + поражения).';
     }
     function renderTable(all) {
       const query=$('search').value.trim().toLocaleLowerCase();
@@ -206,7 +208,7 @@
     function renderEvents(p,query) {
       const q=query.trim().toLocaleLowerCase();
       const records=[...p.results].reverse().filter(r=>data.events[r[0]].name.toLocaleLowerCase().includes(q));
-      $('event-list').innerHTML=records.length ? records.map(([idx,w,l,g])=>{const e=data.events[idx];return `<li><div><strong>${esc(e.name)}</strong><span class="mode-tag">${e.mode}</span><small>${w} побед · ${l} поражений</small></div><b>${g} ${g===1?'карта':'карт'}</b></li>`;}).join('') : '<li class="muted">Нет выступлений по запросу</li>';
+      $('event-list').innerHTML=records.length ? records.map(([idx,w,l,g])=>{const e=data.events[idx];return `<li><div><strong>${esc(e.name)}</strong><span class="mode-tag">${e.mode}</span><small>${w} ${plural(w,'победа','победы','побед')} · ${l} ${plural(l,'поражение','поражения','поражений')}</small></div><b>${g} ${plural(g,'карта','карты','карт')}</b></li>`;}).join('') : '<li class="muted">Нет выступлений по запросу</li>';
     }
     function openDrawer(name) { selected=name;renderDrawer();$('overlay').classList.add('open');$('drawer').classList.add('open');$('drawer').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('close').focus(); }
     function closeDrawer() { selected=null;$('overlay').classList.remove('open');$('drawer').classList.remove('open');$('drawer').setAttribute('aria-hidden','true');document.body.style.overflow=''; }
