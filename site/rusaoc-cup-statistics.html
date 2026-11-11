@@ -26,13 +26,8 @@
     .actions { flex:none; display:flex; flex-direction:column; gap:8px; min-width:230px; }
     .primary { text-align:center;text-decoration:none; border:1px solid #efcc90; border-radius:10px; padding:12px 18px; color:#17212a; font-weight:800; background:linear-gradient(135deg,#f1d69f,#d7a756); box-shadow:0 10px 30px #0005; }
     .primary:hover { filter:brightness(1.06); }
-    .primary:disabled { opacity:.65; cursor:wait; }
-    .secondary { border:1px solid var(--line); border-radius:9px; padding:8px 12px; color:var(--muted); background:#25303a; font-size:12px; }
-    .secondary:hover { color:var(--text); border-color:#7b8a91; }
     .source-row { display:flex; gap:7px 22px; flex-wrap:wrap; color:var(--muted); font-size:13px; }
     .source-row b { color:var(--text); font-weight:600; }
-    .status { min-height:24px; padding-top:10px; color:var(--green); font-size:13px; }
-    .status.error { color:var(--red); }
     .summary { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:11px 0 21px; }
     .metric { position:relative; overflow:hidden; border:1px solid var(--line); border-radius:14px; background:linear-gradient(145deg,#222d38,#18222b); padding:17px 18px; box-shadow:var(--shadow); }
     .metric:before { content:""; position:absolute; width:92px; height:92px; border-radius:50%; right:-42px; top:-40px; border:16px solid #e9bd7015; }
@@ -131,10 +126,9 @@
     <div class="topline"><div class="mark"><span class="seal">R</span><span>Rusaoc Cup · архив серии</span></div><span>Age of Empires II</span></div>
     <div class="hero">
       <div><div class="kicker">По Google Таблице · флаги из Liquipedia</div><h1>Статистика <em>Rusaoc Cup</em></h1><p class="intro">История выступлений по игрокам: участия в кубках, первые места, сыгранные карты и победы. Одиночные, командные и FFA турниры собраны в одной таблице.</p></div>
-      <div class="actions"><a href="rusaoc-cup-liquipedia.html" class="primary">Версия Liquipedia →</a><button id="download" class="secondary" type="button">↓ Скачать текущий срез как HTML</button></div>
+      <div class="actions"><a href="rusaoc-cup-liquipedia.html" class="primary">Версия Liquipedia →</a></div>
     </div>
     <div class="source-row"><span>Данные: <a href="https://docs.google.com/spreadsheets/d/1zDXLyhJwHMQhtCvrNnvTV8H3tVx2WRyXRlqzmrIZRwo/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer">таблица Rusaoc Cup</a> · <a href="https://liquipedia.net/ageofempires/Rusaoc_Cup" target="_blank" rel="noopener noreferrer">серия на Liquipedia</a></span><span>Срез: <b id="updated"></b></span></div>
-    <div class="status" id="status" role="status" aria-live="polite"></div>
   </header>
   <main class="wrap">
     <section class="summary" aria-label="Покрытие данных"><div class="metric"><small>Кубков с данными</small><strong id="event-count">—</strong><span id="event-total"></span></div><div class="metric"><small>Игроков в таблице</small><strong id="player-count">—</strong><span>уникальных строк игроков</span></div><div class="metric"><small>Участий игроков</small><strong id="entry-count">—</strong><span>по одному на игрока и кубок</span></div><div class="metric"><small>Карт в записях игроков</small><strong id="game-count">—</strong><span>командные карты учитываются каждому</span></div></section>
@@ -167,7 +161,6 @@
     function renderCountryNote(players){const known=players.filter(p=>countryFor(p.name)).length;const date=new Date(countryData.updated).toLocaleDateString('ru-RU',{timeZone:'Asia/Tomsk'});$('country-note').textContent=`Флаги: страна указана у ${known} из ${players.length} игроков в профилях или турнирах Liquipedia (проверено ${date}). При отсутствии данных флаг не показывается.`;}
     const modes=['1v1','2v2','3v3','FFA'];
     let data=seed,sort='entries',descending=true,selected=null;
-    function status(s,error=false) { $('status').textContent=s; $('status').classList.toggle('error',error); }
     function avatar(name) { return `<span class="avatar" aria-hidden="true">${esc(name.charAt(0).toUpperCase())}</span>`; }
     function playerStats(p) {
       const out={name:p.name,entries:p.results.length,titles:p.places[0],games:0,wins:0,losses:0,team:0,rate:0};
@@ -216,14 +209,6 @@
     }
     function openDrawer(name) { selected=name;renderDrawer();$('overlay').classList.add('open');$('drawer').classList.add('open');$('drawer').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('close').focus(); }
     function closeDrawer() { selected=null;$('overlay').classList.remove('open');$('drawer').classList.remove('open');$('drawer').setAttribute('aria-hidden','true');document.body.style.overflow=''; }
-    function download() {
-      const clone=document.documentElement.cloneNode(true);
-      clone.querySelector('#seed').textContent=JSON.stringify(data).replace(/</g,'\\u003c');
-      const blob=new Blob(['<!doctype html>\n',clone.outerHTML],{type:'text/html;charset=utf-8'});
-      const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='rusaoc-cup-statistics.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-      status('Текущий срез сохранён в HTML.');
-    }
-    $('download').addEventListener('click',download);
     $('search').addEventListener('input',render);
     $('sort').addEventListener('change',e=>{sort=e.target.value;descending=sort!=='name';render();});
     $('direction').addEventListener('click',()=>{descending=!descending;render();});
