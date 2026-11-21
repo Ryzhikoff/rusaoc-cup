@@ -1,4 +1,4 @@
-"""Merge only explicitly confirmed player identities, preserving source totals."""
+"""Confirmed player identities, display aliases and source-preserving merges."""
 
 import copy
 import json
@@ -10,6 +10,35 @@ CONFIG = Path(__file__).resolve().parents[1] / "data" / "goodgame-identities.jso
 def merge_aliases():
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     return {alias: config["aliases"][alias] for alias in config.get("mergePlayers", [])}
+
+
+def build_aliases(names, extra_aliases=None):
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    pairs = [*config.get("aliases", {}).items(), *(extra_aliases or {}).items()]
+    key = lambda name: name.strip().casefold()
+    graph, labels = {}, {}
+    for alias, target in pairs:
+        a, b = key(alias), key(target)
+        graph.setdefault(a, set()).add(b)
+        graph.setdefault(b, set()).add(a)
+        labels.setdefault(a, alias)
+        labels.setdefault(b, target)
+    names = sorted(set(names), key=lambda name: (key(name), name))
+    labels.update((key(name), name) for name in names)
+    labels.update(config.get("aliasDisplayNames", {}))
+    result = {}
+    for name in names:
+        current = key(name)
+        seen, pending = {current}, [current]
+        while pending:
+            for other in graph.get(pending.pop(), ()):
+                if other not in seen:
+                    seen.add(other)
+                    pending.append(other)
+        aliases = sorted((labels[other] for other in seen if other != current), key=key)
+        if aliases:
+            result[name] = aliases
+    return result
 
 
 def merge_players(snapshot):

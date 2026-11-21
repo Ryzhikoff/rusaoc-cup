@@ -36,6 +36,10 @@
     "alfons_dober": "Alfons_D",
     "timurinho_hair": "timurinho1436"
   },
+  "aliasDisplayNames": {
+    "rexan_": "Rexan_",
+    "колясик": "Колясик"
+  },
   "mergePlayers": ["p0pengaben", "rexan_", "колясик"],
   "users": {
     "492483": "OLADUSHEK",

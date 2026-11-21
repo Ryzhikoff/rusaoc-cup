@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.parse import urlencode, quote
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
-from player_merges import merge_players
+from player_merges import build_aliases, merge_players
 
 PAGES = {}
 ALIASES={'i an ta go ni st i':'AntagonisT','iantagonisti':'AntagonisT','daniil':'DzeDanik','daniil dz':'DzeDanik'}
@@ -506,6 +506,10 @@ def replace_json(page, element, value):
 
 
 def write_html(seed, countries):
+    names = {player["name"] for player in seed["players"]}
+    if SHEET_OUTPUT.exists():
+        names.update(player["name"] for player in read_seed(SHEET_OUTPUT)["players"])
+    aliases = build_aliases(names, ALIASES)
     prepared = {}
     for path in (OUTPUT, SHEET_OUTPUT):
         if not path.exists():
@@ -513,7 +517,8 @@ def write_html(seed, countries):
         page = path.read_text(encoding="utf-8")
         if path == OUTPUT:
             page = replace_json(page, "seed", seed)
-        prepared[path] = replace_json(page, "countries", countries)
+        page = replace_json(page, "countries", countries)
+        prepared[path] = replace_json(page, "aliases", aliases)
     # Validate both documents before replacing either file.
     for path, page in prepared.items():
         path.with_suffix(".html.tmp").write_text(page, encoding="utf-8")

@@ -8,7 +8,7 @@ import tempfile
 import google_sheet
 import goodgame
 import liquipedia
-from player_merges import merge_players
+from player_merges import build_aliases, merge_players
 import tournaments
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,6 +42,7 @@ def update_site(directory=ROOT / "site"):
     for name, snapshot in snapshots.items():
         validate_seed(snapshot, previous[name], name)
     names = {player["name"] for snapshot in snapshots.values() for player in snapshot["players"]}
+    aliases = build_aliases(names, liquipedia.ALIASES)
     countries = liquipedia.make_countries(names, liquipedia.fetch_player_profiles(names))
     if not countries["players"]:
         raise ValueError("No country information returned")
@@ -50,7 +51,8 @@ def update_site(directory=ROOT / "site"):
     prepared = {}
     for name, snapshot in snapshots.items():
         document = liquipedia.replace_json(originals[name], "seed", snapshot)
-        prepared[name] = liquipedia.replace_json(document, "countries", countries)
+        document = liquipedia.replace_json(document, "countries", countries)
+        prepared[name] = liquipedia.replace_json(document, "aliases", aliases)
     prepared[FILES[1]] = liquipedia.replace_json(prepared[FILES[1]], "tournaments", catalog)
     with tempfile.TemporaryDirectory(prefix=".rusaoc-update-", dir=directory.parent) as temporary:
         for name, document in prepared.items():

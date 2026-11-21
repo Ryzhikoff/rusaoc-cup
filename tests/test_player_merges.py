@@ -15,6 +15,27 @@ import update
 
 
 class PlayerMergeTests(unittest.TestCase):
+    def test_display_aliases_preserve_case_and_support_both_page_names(self):
+        result = player_merges.build_aliases(
+            {"Landau", "Landau_", "UMARR", "Koliasik", "Daniil", "DzeDanik", "Unrelated"},
+            liquipedia.ALIASES)
+        self.assertEqual(result["Landau"], ["Landau_", "p0pengaben"])
+        self.assertEqual(result["UMARR"], ["Rexan_"])
+        self.assertEqual(result["Koliasik"], ["Колясик"])
+        self.assertIn("DzeDanik", result["Daniil"])
+        self.assertIn("Daniil", result["DzeDanik"])
+        self.assertNotIn("Unrelated", result)
+        for name, aliases in result.items():
+            self.assertNotIn(name.casefold(), [a.casefold() for a in aliases])
+
+    def test_display_alias_groups_handle_chains_cycles_and_duplicate_casing(self):
+        config = {"aliases": {"old": "Main", "older": "Old", "main": "Main"},
+                  "aliasDisplayNames": {"older": "Older"}}
+        with patch.object(player_merges, "CONFIG") as path:
+            path.read_text.return_value = json.dumps(config)
+            result = player_merges.build_aliases({"Main", "Old", "Unrelated"}, {"OLD": "Main"})
+        self.assertEqual(result, {"Main": ["Old", "Older"], "Old": ["Main", "Older"]})
+
     def test_confirmed_merge_preserves_results_places_and_account_ids(self):
         source = {"updated": "2026-11-21T00:00:00Z", "events": [{"players": 1}] * 2,
                   "players": [

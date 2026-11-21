@@ -11,7 +11,7 @@ from urllib.parse import urlsplit, unquote
 from html.parser import HTMLParser
 
 import liquipedia
-from player_merges import merge_players
+from player_merges import build_aliases, merge_players
 import tournaments
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +30,10 @@ class Links(HTMLParser):
 
 
 def check_site(directory=ROOT / "site"):
+    names = {player["name"]
+             for filename in ("rusaoc-cup-statistics.html", "rusaoc-cup-liquipedia.html")
+             for player in liquipedia.read_seed(directory / filename)["players"]}
+    expected_aliases = build_aliases(names, liquipedia.ALIASES)
     # Cover future countries too: daily data updates must never introduce
     # a country code whose flag image is absent from the published site.
     for code in liquipedia.COUNTRY_CODES:
@@ -55,6 +59,9 @@ def check_site(directory=ROOT / "site"):
         if name == "index.html":
             continue
         seed = liquipedia.read_seed(path)
+        alias_block = re.search(r'<script id="aliases" type="application/json">(.*?)</script>', text, re.S)
+        if not alias_block or json.loads(alias_block[1]) != expected_aliases:
+            raise ValueError(f"{name}: missing or outdated player aliases")
         if merge_players(seed) != seed:
             raise ValueError(f"{name}: confirmed player identities are not merged")
         if len(seed["players"]) < 500 or len(seed["events"]) < 190:

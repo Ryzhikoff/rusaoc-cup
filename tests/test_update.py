@@ -74,6 +74,21 @@ class CountryTests(unittest.TestCase):
 
 
 class PublicationTests(unittest.TestCase):
+    def test_daily_update_refreshes_aliases_in_both_pages(self):
+        seed = {"events": [{"cup": 1}], "players": [{"name": "Landau", "results": [[0, 1, 0, 1]]}]}
+        document = '<script id="seed" type="application/json">' + json.dumps(seed) + '</script><script id="countries" type="application/json">{}</script><script id="aliases" type="application/json">{}</script><script id="tournaments" type="application/json">{}</script>'
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for name in update.FILES:
+                (directory / name).write_text(document)
+            with patch.object(google_sheet, "fetch_sheet", return_value=seed), patch.object(goodgame, "supplement_sheet", return_value=seed), patch.object(liquipedia, "fetch_pages", return_value={}), patch.object(liquipedia, "build", return_value=[]), patch.object(liquipedia, "make_seed", return_value=seed), patch.object(liquipedia, "fetch_player_profiles", return_value=[]), patch.object(liquipedia, "make_countries", return_value={"players": {"landau": {"code": "RU"}}}), patch.object(update.tournaments, "build_catalog", return_value=({}, {})), patch("builtins.print"):
+                update.update_site(directory)
+            for name in update.FILES:
+                text = (directory / name).read_text()
+                block = text.split('<script id="aliases" type="application/json">')[1].split('</script>')[0]
+                self.assertIn("p0pengaben", json.loads(block)["Landau"])
+                self.assertEqual(liquipedia.read_seed(directory / name), seed)
+
     def test_late_network_failure_preserves_both_pages(self):
         seed = {"updated": "2026-11-11T00:00:00Z", "events": [{"cup": 1}], "players": [{"name": "Alice", "results": [[0, 1, 0, 1, 1]]}]}
         document = '<script id="seed" type="application/json">' + json.dumps(seed) + '</script><script id="countries" type="application/json">{}</script>'
