@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import urlencode, quote
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
+from player_merges import merge_players
 
 PAGES = {}
 ALIASES={'i an ta go ni st i':'AntagonisT','iantagonisti':'AntagonisT','daniil':'DzeDanik','daniil dz':'DzeDanik'}
@@ -492,7 +493,7 @@ def make_seed(pages):
         name = sorted(player["names"].items(), key=lambda item: (-item[1], -len(item[0]), item[0].casefold()))[0][0]
         final.append({"name": name, "results": player["results"]})
     final.sort(key=lambda player: player["name"].casefold())
-    return {"updated": datetime.datetime.now(datetime.timezone.utc).isoformat(), "events": events, "players": final}
+    return merge_players({"updated": datetime.datetime.now(datetime.timezone.utc).isoformat(), "events": events, "players": final})
 
 
 def replace_json(page, element, value):

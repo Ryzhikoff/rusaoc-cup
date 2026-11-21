@@ -8,6 +8,7 @@ import tempfile
 import google_sheet
 import goodgame
 import liquipedia
+from player_merges import merge_players
 import tournaments
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -33,7 +34,7 @@ def update_site(directory=ROOT / "site"):
     originals = {name: (directory / name).read_text(encoding="utf-8") for name in FILES}
     previous = {name: liquipedia.read_seed(directory / name) for name in FILES}
     # Fetch and validate everything before preparing any on-disk replacements.
-    sheet = google_sheet.fetch_sheet()
+    sheet = merge_players(google_sheet.fetch_sheet())
     liquipedia.PAGES = liquipedia.fetch_pages()
     wiki = liquipedia.make_seed(liquipedia.build())
     sheet = goodgame.supplement_sheet(sheet, liquipedia.PAGES, previous[FILES[1]])

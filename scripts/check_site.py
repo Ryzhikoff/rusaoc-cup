@@ -11,6 +11,7 @@ from urllib.parse import urlsplit, unquote
 from html.parser import HTMLParser
 
 import liquipedia
+from player_merges import merge_players
 import tournaments
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,6 +55,8 @@ def check_site(directory=ROOT / "site"):
         if name == "index.html":
             continue
         seed = liquipedia.read_seed(path)
+        if merge_players(seed) != seed:
+            raise ValueError(f"{name}: confirmed player identities are not merged")
         if len(seed["players"]) < 500 or len(seed["events"]) < 190:
             raise ValueError(f"{name}: incomplete snapshot")
         event_counts = [0] * len(seed["events"])

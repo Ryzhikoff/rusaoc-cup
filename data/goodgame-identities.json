@@ -1,5 +1,5 @@
 {
-  "note": "Явные соответствия ников Google Таблицы, GoodGame и Liquipedia. Проверено по турнирам 186–192 и контрольному турниру 187. Нечёткое сравнение имён не используется.",
+  "note": "Явные соответствия ников Google Таблицы, GoodGame и Liquipedia. Проверено по турнирам 186–192 и контрольному турниру 187. Нечёткое сравнение имён не используется. Слияние p0pengaben с Landau под именем Landau подтверждено пользователем 2026-11-21.",
   "aliases": {
     "oladushek__": "OLADUSHEK",
     "h1ew": "Lamo",
@@ -28,11 +28,13 @@
     "marbas": "Marbas9969",
     "_district_": "District",
     "landau_": "Landau",
+    "p0pengaben": "Landau",
     "beifogor": "Belfogor",
     "alfons_dober1": "Alfons_D",
     "alfons_dober": "Alfons_D",
     "timurinho_hair": "timurinho1436"
   },
+  "mergePlayers": ["p0pengaben"],
   "users": {
     "492483": "OLADUSHEK",
     "1482101": "Lamo",
