@@ -25,7 +25,20 @@
 .text-button{padding:0;border:0;background:none;color:var(--text);font-weight:700;text-align:left}
 .text-button:hover{color:var(--gold)}
 .event-link{font-size:inherit;color:var(--gold)}
-.player-table{min-width:1200px}
+.player-table{min-width:980px;table-layout:fixed}
+.player-table th,.player-table td{padding:10px 8px}
+.player-table th{width:7%;white-space:normal;overflow-wrap:anywhere;letter-spacing:.02em}
+.player-table th:first-child{width:4%}
+.player-table th:nth-child(2){width:16%}
+.player-table th:nth-child(3),.player-table th:nth-child(8){width:8%}
+.player-table th:nth-child(5){width:11%}
+.player-table th:nth-child(6),.player-table th:nth-child(10),.player-table th:last-child{width:10%}
+.player-table th:nth-child(9){width:9%}
+.player-table .player-button{max-width:100%}
+.player-table .player-identity>span{min-width:0;overflow-wrap:anywhere}
+.player-table .rate{gap:6px;white-space:nowrap}
+.player-table .rate-bar{width:36px;flex:0 1 36px}
+@media(max-width:1100px){.player-table th{font-size:10px;letter-spacing:0}}
 .earnings-value{white-space:nowrap;font-size:12px}
 .drawer .profile-metrics.with-prizes{grid-template-columns:repeat(3,minmax(0,1fr))}
 .drawer .profile-metrics .prize-value{font-size:17px;white-space:nowrap}
