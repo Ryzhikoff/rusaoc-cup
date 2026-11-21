@@ -95,6 +95,30 @@ class PlayerMergeTests(unittest.TestCase):
             for filename in update.FILES:
                 self.assertEqual((directory / filename).read_text(), document)
 
+    def test_rexan_third_place_is_credited_to_umarr_as_half_the_team_prize(self):
+        source = {"players": [{"name": "UMARR"}, {"name": "AntagonisT"}],
+                  "events": [{"name": "Rusaoc Cup 153", "mode": "2v2"}]}
+        raw = "{{Infobox league|date=2025-03-08|format=2v2|team_number=25|localcurrency=RUB|prizepool=14845}}{{TeamCard|team=Third|p1=AntagonisT|p2=Rexan_}}{{TeamPrizePool|{{Slot|place=3|localprize=2969|usdprize=32.99|{{Opponent|Third}}}}}}"
+        event = tournaments.prepare_events({"Rusaoc Cup/153": raw}, "", source)[0]
+        self.assertEqual(event["prizes"][0]["players"], ["AntagonisT", "UMARR"])
+        earnings = tournaments.player_earnings([event], source)
+        self.assertEqual(set(earnings), {"UMARR", "AntagonisT"})
+        self.assertEqual(earnings["UMARR"]["rubSixths"], 296900 * 3)
+        self.assertEqual(earnings["UMARR"]["usdSixths"], 3299 * 3)
+        self.assertEqual(earnings["UMARR"]["awards"][0]["place"], "3")
+        self.assertEqual(earnings["AntagonisT"], earnings["UMARR"])
+        resolver = goodgame.Identities(source, json.loads(goodgame.CONFIG.read_text()))
+        self.assertEqual(resolver.name("Rexan_"), "UMARR")
+
+    def test_rexan_merge_keeps_already_counted_umarr_medals(self):
+        source = {"players": [{"name": "UMARR", "places": [1, 1, 2, 0], "results": [[1, 1, 0, 1]]}]}
+        self.assertEqual(player_merges.merge_players(source), source)
+        source["players"].append({"name": "Rexan_", "results": [[0, 2, 1, 3]]})
+        result = player_merges.merge_players(source)
+        self.assertEqual(result["players"], [{"name": "UMARR", "places": [1, 1, 2, 0],
+                                              "results": [[0, 2, 1, 3], [1, 1, 0, 1]]}])
+        self.assertEqual(player_merges.merge_players(result), result)
+
 
 if __name__ == "__main__":
     unittest.main()
